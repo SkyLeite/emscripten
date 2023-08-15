@@ -233,16 +233,15 @@ class Ports:
           if os.path.exists(target) and dir_is_newer(path, target):
             logger.warning(uptodate_message)
             return
-          with cache.lock('unpack local port'):
-            # Another early out in case another process unpackage the library while we were
-            # waiting for the lock
-            if os.path.exists(target) and not dir_is_newer(path, target):
-              logger.warning(uptodate_message)
-              return
-            logger.warning(f'grabbing local port: {name} from {path} to {fullname} (subdir: {subdir})')
-            utils.delete_dir(fullname)
-            shutil.copytree(path, target)
-            Ports.clear_project_build(name)
+          # Another early out in case another process unpackage the library while we were
+          # waiting for the lock
+          if os.path.exists(target) and not dir_is_newer(path, target):
+            logger.warning(uptodate_message)
+            return
+          logger.warning(f'grabbing local port: {name} from {path} to {fullname} (subdir: {subdir})')
+          utils.delete_dir(fullname)
+          shutil.copytree(path, target)
+          Ports.clear_project_build(name)
           return
 
     url_filename = url.rsplit('/')[-1]
