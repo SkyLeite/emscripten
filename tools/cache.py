@@ -154,22 +154,21 @@ def get(shortname, creator, what=None, force=False, quiet=False, deferred=False)
     # should never happen
     raise Exception(f'FROZEN_CACHE is set, but cache file is missing: "{shortname}" (in cache root path "{cachedir}")')
 
-  with lock(shortname):
-    if cachename.exists() and not force:
-      return str(cachename)
-    if what is None:
-      if shortname.endswith(('.bc', '.so', '.a')):
-        what = 'system library'
-      else:
-        what = 'system asset'
-    message = f'generating {what}: {shortname}... (this will be cached in "{cachename}" for subsequent builds)'
-    logger.info(message)
-    utils.safe_ensure_dirs(cachename.parent)
-    creator(str(cachename))
-    if not deferred:
-      assert cachename.exists()
-    if not quiet:
-      logger.info(' - ok')
+  if cachename.exists() and not force:
+    return str(cachename)
+  if what is None:
+    if shortname.endswith(('.bc', '.so', '.a')):
+      what = 'system library'
+    else:
+      what = 'system asset'
+  message = f'generating {what}: {shortname}... (this will be cached in "{cachename}" for subsequent builds)'
+  logger.info(message)
+  utils.safe_ensure_dirs(cachename.parent)
+  creator(str(cachename))
+  if not deferred:
+    assert cachename.exists()
+  if not quiet:
+    logger.info(' - ok')
 
   return str(cachename)
 
